@@ -14,6 +14,7 @@
 #define VHTYPE_PURE		0
 #define VHTYPE_BOX2D	1
 #define VHTYPE_CHIPMUNK 2
+#define VHTYPE_LTS		3
 
 #define VHSTYLE_ASSIGN	0
 #define VHSTYLE_INIT	1
@@ -284,10 +285,17 @@
 			NSString *itemString = nil;
 			
 			// at the beginning of a different sprite...
-			result = [result stringByAppendingFormat:@"//row %i, col %i\n", ([pointMatrix count] - r), (c + 1)];
+			if ([typePopUpButton selectedTag] == VHTYPE_LTS) {
 			
-			if ([typePopUpButton selectedTag] != VHTYPE_PURE) {
-				result = [result stringByAppendingFormat:@"int num = %i;\n", [points count]];
+				result = @"[NSArray arrayWithObjects:\n";
+			}
+			else {
+				
+				result = [result stringByAppendingFormat:@"//row %i, col %i\n", ([pointMatrix count] - r), (c + 1)];
+				
+				if ([typePopUpButton selectedTag] != VHTYPE_PURE) {
+					result = [result stringByAppendingFormat:@"int num = %i;\n", [points count]];
+				}
 			}
 			
 			for (int p = 0; p < [points count]; p++) {
@@ -346,12 +354,54 @@
 								break;
 						}
 						
+						break;						
+					case VHTYPE_LTS:
+						itemString = [NSString stringWithFormat:@"[NSValue valueWithCGPoint:CGPointMake(%.1ff, %.1ff)],", point.x / 2.0f, point.y / 2.0f]; // HACK: I prefer setting collision points with the HD version of an image, so need to scale down here.
+						switch ([stylePopUpButton selectedTag]) {
+							case VHSTYLE_ASSIGN:
+								result = [result stringByAppendingFormat:@"    %@\n", itemString];
+								break;
+							case VHSTYLE_INIT:
+								if (p == 0) {
+									result = [result stringByAppendingFormat:@"CGPoint %@[] = {\n", variableName];
+								}
+								
+                                result = [result stringByAppendingString:@"    "];
+								result = [result stringByAppendingString:itemString];
+								
+								if (p + 1 == [points count]) {
+									result = [result stringByAppendingString:@"\n};\n"];
+								} else {
+									result = [result stringByAppendingString:@",\n"];
+								}
+								
+								break;
+							default:
+								break;
+						}
+						
 						break;
 					default:
 						break;
+						
+/*						NSArray *testPolygon = [NSArray arrayWithObjects:
+												[NSValue valueWithCGPoint:CGPointMake(13.7f, 6.4f)],
+												[NSValue valueWithCGPoint:CGPointMake(-13.9f, 6.4f)],
+												[NSValue valueWithCGPoint:CGPointMake(-13.7f, -1.8f)],
+												[NSValue valueWithCGPoint:CGPointMake(-8.4f, -6.3f)],
+												[NSValue valueWithCGPoint:CGPointMake(13.6f, -6.4f)],
+												nil];*/
 				}
 			}
-			result = [result stringByAppendingString:@"\n"];			  
+			
+			if ([typePopUpButton selectedTag] == VHTYPE_LTS) {
+			
+				result = [result stringByAppendingString:@"nil];\n"];
+			}
+			else {
+				
+				result = [result stringByAppendingString:@"\n"];
+			}
 		}
 	}
 						  

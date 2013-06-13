@@ -6,3 +6,6 @@ build/*
 # osx noise
 .DS_Store
 profile
+VertexHelper.xcodeproj/xcuserdata/aaroncox.xcuserdatad/xcschemes/VertexScanner.xcscheme
+VertexHelper.xcodeproj/xcuserdata/aaroncox.xcuserdatad/xcschemes/xcschememanagement.plist
+VertexHelper.xcodeproj/xcuserdata/aaroncox.xcuserdatad/xcschemes/VertexHelper.xcscheme
